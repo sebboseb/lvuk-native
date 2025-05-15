@@ -30,4 +30,40 @@ In the output, you'll find options to open the app in a
 
 ...
 
+1. Flatlist Optimization
+- Replaced nested scroll views and ParallaxScrollView with a properly structured FlatList.
+
+- Moved TextInput and Image into FlatList's ListHeaderComponent to avoid nesting issues warning.
+
+Used FlatList performance props for better performace:
+
+* initialNumToRender={10}
+* maxToRenderPerBatch={10}
+* windowSize={5}
+* removeClippedSubviews={true}
+* keyboardShouldPersistTaps="handled"
+
+2. Removed redundant useEffect calls for fetching and filtering users since were were already not using pagination on api so did the filtering part on pre-fetched users list.
+
+3. Typescript Enhancments
+- Defined a User type for better type safety.
+
+4. Redux Toolkit Integration
+
+- Used createAsyncThunk for API calls with error and loading state handling.
+
+- Moved all API logic out of the component, improving maintainability and testability.
+
+5. Memoization for Performance
+
+- Wrapped renderItem and keyExtractor in useCallback() to prevent unnecessary re-renders of list items.
+
+6. Styling Improvements
+
+- Created clear, responsive styling for the header image, input field, and list items.
+
+
+
+
+
 ------------------------------------------------------------------------------------------

@@ -1,67 +1,104 @@
-import { StyleSheet, FlatList, Text, TextInput, View} from 'react-native';
-import React, { useEffect, useState } from 'react';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { IconSymbol } from '@/components/ui/IconSymbol';
+import React, { useEffect, useState, useCallback } from 'react';
+import {
+  StyleSheet,
+  FlatList,
+  Text,
+  TextInput,
+  Image,
+  View,
+  ListRenderItem,
+} from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUsers } from '../../store/reducers/userSlice';
+import { RootState, AppDispatch } from '../../store';
+import { User } from '../../constants/Types';
 
 export default function TabTwoScreen() {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [query, setQuery] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const { users, status } = useSelector((state: RootState) => state.users);
+  const [query, setQuery] = useState<string>('');
 
   useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((res) => res.json())
-      .then((data) => setUsers(data));
-  });
+    if (status === 'idle') {
+      dispatch(fetchUsers());
+    }
+  }, [dispatch, status]);
 
-  useEffect(() => {
-    fetch("https://jsonplaceholder.typicode.com/users")
-      .then((res) => res.json())
-      .then((data) => {
-        const filtered = data.filter((user) =>
-          user.name.toLowerCase().includes(query.toLowerCase())
-        );
-        setFilteredUsers(filtered);
-      });
-  }, [query]); 
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const renderItem: ListRenderItem<User> = useCallback(({ item }) => (
+    <Text style={styles.user}>{item.name}</Text>
+  ), []);
+
+  const keyExtractor = useCallback((item: User) => item.id.toString(), []);
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="brain.head.profile.fill"
-          style={styles.headerImage}
-        />
-      }>
-       <View style={styles.container}>
-        <TextInput
-          style={styles.input}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search users..."
-        />
-        </View>
-        <FlatList
-          data={filteredUsers}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => <Text style={styles.user}>{item.name}</Text>}
-        />
-    </ParallaxScrollView>
+    <FlatList
+      data={filteredUsers}
+      keyExtractor={keyExtractor}
+      renderItem={renderItem}
+      initialNumToRender={10}
+      maxToRenderPerBatch={10}
+      windowSize={5}
+      removeClippedSubviews={true}
+      keyboardShouldPersistTaps="handled"
+      contentContainerStyle={styles.listContent}
+      ListHeaderComponent={
+        <>
+          <View style={styles.headerImageWrapper}>
+            <Image
+              source={require('@/assets/images/lv-logo.png')}
+              style={styles.reactLogo}
+            />
+          </View>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              value={query}
+              onChangeText={setQuery}
+              placeholder="Search users..."
+            />
+          </View>
+        </>
+      }
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  listContent: {
+    paddingBottom: 20,
   },
-  container: {
-    flexDirection: 'row',
-    gap: 8,
+  headerImageWrapper: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    height: 180
+  },
+  reactLogo: {
+    height: 178,
+    width: 290,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    resizeMode: 'contain'
+  },
+  inputWrapper: {
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  input: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 8,
+  },
+  user: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+    fontSize: 16,
   },
 });
