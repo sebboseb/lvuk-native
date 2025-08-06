@@ -11,7 +11,7 @@ import Animated, {
 import { useBottomTabOverflow } from "@/components/ui/TabBarBackground";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
-const HEADER_HEIGHT = 200;
+const HEADER_HEIGHT = 170;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;

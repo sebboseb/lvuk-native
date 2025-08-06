@@ -98,7 +98,7 @@ export default function TabTwoScreen() {
         <>
           <View style={styles.resultsHeader}>
             <Text style={styles.resultsCount}>
-              Showing {filtered.length} user
+              Found {filtered.length} user
               {filtered.length !== 1 ? "s" : ""}
               {debouncedQuery ? ` for "${debouncedQuery}"` : ""}
             </Text>
